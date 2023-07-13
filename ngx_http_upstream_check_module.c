@@ -2670,12 +2670,20 @@ ngx_http_upstream_check_status_update(ngx_http_upstream_check_peer_t *peer,
             ngx_log_error(NGX_LOG_ERR, ngx_cycle->log, 0,
                           "enable check peer: %V ",
                           &peer->check_peer_addr->name);
+        } else if (peer->shm->access_time == 0) {
+            ngx_log_error(NGX_LOG_ERR, ngx_cycle->log, 0,
+                          "enable check peer: %V ",
+                          &peer->check_peer_addr->name);
         }
     } else {
         peer->shm->rise_count = 0;
         peer->shm->fall_count++;
         if (!peer->shm->down && peer->shm->fall_count >= ucscf->fall_count) {
             peer->shm->down = 1;
+            ngx_log_error(NGX_LOG_ERR, ngx_cycle->log, 0,
+                          "disable check peer: %V ",
+                          &peer->check_peer_addr->name);
+        } else if (peer->shm->access_time == 0) {
             ngx_log_error(NGX_LOG_ERR, ngx_cycle->log, 0,
                           "disable check peer: %V ",
                           &peer->check_peer_addr->name);
